@@ -1,10 +1,8 @@
-<img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*MmUyuPFhqG5jDreLH8VSJA.jpeg" width="100%" />
-
 # 👤 Users CRUD Service 🚀
 
 > Serviço para CRUD de usuários, para fins de aprendizado em **Go**.
->
-> **Fluxo arquitetural:** `Handler → Service → Domain → Storage`
+
+<img src="https://miro.medium.com/v2/resize:fit:720/format:webp/1*MmUyuPFhqG5jDreLH8VSJA.jpeg" width="100%" />
 
 ---
 

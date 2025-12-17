@@ -2,9 +2,10 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"meu-treino-golang/users-crud/internal/common"
 	"meu-treino-golang/users-crud/internal/storage/postgres/users"
@@ -12,10 +13,17 @@ import (
 )
 
 func main() {
-	// 1. Conectar ao banco de dados
-	database, err := gorm.Open(sqlite.Open("users.db"), &gorm.Config{})
+	// 1. Conectar ao banco de dados PostgreSQL
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		// Default DSN para desenvolvimento local
+		dsn = "host=localhost user=postgres password=postgres dbname=usersdb port=5432 sslmode=disable TimeZone=UTC"
+		log.Println("DATABASE_URL not set. Using default DSN for local development.")
+	}
+
+	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Failed to connect to database:", err)
+		log.Fatal("Failed to connect to PostgreSQL database:", err)
 	}
 
 	// 2. AutoMigrate UserModel

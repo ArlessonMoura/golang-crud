@@ -6,21 +6,12 @@ linters-settings:
   depguard:
     rules:
       default:
-        files: ['**/*.go']
-        linters:
-          enable:
-            - depguard
-
-        linters-settings:
-          depguard:
-            rules:
-              default:
-                files: ["**/*.go"]
-                deny:
-                  - pkg: "meu-treino-golang/users-crud/internal/storage/.*"
-                    desc: "Storage não pode ser importado fora do wiring."
-              handlers:
-                files: ["pkg/handler/**.go"]
-                allow:
-                  - "meu-treino-golang/users-crud/internal/service/.*"
-                  - "meu-treino-golang/users-crud/dto/.*"
+        files: ["**/*.go"]
+        deny:
+          - pkg: "meu-treino-golang/users-crud/internal/storage/.*"
+            desc: "Storage não pode ser importado fora do wiring."
+      handlers:
+        files: ["pkg/handler/**.go"]
+        allow:
+          - "meu-treino-golang/users-crud/internal/service/.*"
+          - "meu-treino-golang/users-crud/dto/.*"

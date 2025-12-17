@@ -1,29 +1,41 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "meu-treino-golang/users-crud/controller"
-    "meu-treino-golang/users-crud/db"
-    "meu-treino-golang/users-crud/repository"
-    "meu-treino-golang/users-crud/service"
+	"log"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"meu-treino-golang/users-crud/internal/common"
+	"meu-treino-golang/users-crud/internal/storage/postgres/users"
+	"meu-treino-golang/users-crud/routes"
 )
 
 func main() {
-    // 1. Conectar ao DB e migrar
-    db.ConnectDatabase()
+	// 1. Conectar ao banco de dados
+	database, err := gorm.Open(sqlite.Open("users.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
 
-    // 2. Inicializar repositório, serviço e controller
-    userRepo := repository.NewUserRepository()
-    userSvc := service.NewUserService(userRepo)
-    userCtrl := controller.NewUserController(userSvc)
+	// 2. AutoMigrate UserModel
+	if err := database.AutoMigrate(&users.UserModel{}); err != nil {
+		log.Fatal("Failed to migrate database:", err)
+	}
 
-    // 3. Inicializar Gin
-    router := gin.Default()
+	// 3. Inicializar dependências
+	deps := &common.Dependencies{
+		DB: database,
+	}
 
-    // 4. Registrar rotas (agrupando por /api, opcional)
-    api := router.Group("/api")
-    userCtrl.RegisterRoutes(api) // rotas ficarão em /api/users
+	// 4. Inicializar Gin
+	router := gin.Default()
 
-    // 5. Iniciar servidor
-    router.Run(":8080") // padrão: localhost:8080
+	// 5. Registrar rotas
+	routes.RegisterRoutes(router, deps)
+
+	// 6. Iniciar servidor
+	if err := router.Run(":8080"); err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
 }

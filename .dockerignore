@@ -1,0 +1,10 @@
+vendor
+.git
+*.db
+users.db
+*.log
+node_modules
+/.vscode
+bin
+*.exe
+*.test

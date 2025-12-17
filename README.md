@@ -1,301 +1,93 @@
-# 🚀 CRUD de Usuários com Golang + Gin + GORM
+# Users CRUD Service
 
-![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=for-the-badge&logo=go&logoColor=white)
-![Gin](https://img.shields.io/badge/Gin-Gonic-00ADD8?style=for-the-badge&logo=go&logoColor=white)
-![GORM](https://img.shields.io/badge/GORM-ORM-blue?style=for-the-badge)
-![SQLite](https://img.shields.io/badge/SQLite-Database-blue?style=for-the-badge&logo=sqlite&logoColor=white)
+Repositório de referência para um serviço HTTP minimalista de CRUD de usuários, implementado com arquitetura limpa (Handler → Service → Domain → Storage).
 
-## ✨ Descrição
+**Módulo**: `meu-treino-golang/users-crud` (veja [go.mod](go.mod)).
 
-Um projeto simples de **CRUD de Usuários** usando **Golang**, **Gin** e **GORM** com **SQLite**, seguindo a arquitetura em camadas:
+Visão geral (resumo):
 
-> **Repository → Service → Controller**
+- `pkg/handler` — camada HTTP (rotas e handlers).
+- `internal/service` — contratos (interfaces) e DTOs.
+- `internal/service/domain/users` — regras de negócio e validações.
+- `internal/storage/postgres/users` — adapter GORM que implementa a interface de repositório.
+- `internal/common` — provisionamento de dependências (ex.: DB).
+- `routes` — função para registrar rotas no servidor HTTP.
 
----
+Estrutura relevante (trechos importantes):
 
-## 📦 Tecnologias utilizadas
+- `main.go` — inicia a aplicação, conecta ao PostgreSQL, executa `AutoMigrate` e registra rotas ([main.go](main.go)).
+- `routes/routes.go` — registra handlers com o `gin.Engine` ([routes/routes.go](routes/routes.go)).
+- `pkg/handler/users/` — `InitHandler`, `Handler` e rotas para `/api/users` ([pkg/handler/users/handler.go](pkg/handler/users/handler.go)).
+- `dto/` — DTOs HTTP: `CreateUserRequest`, `UserResponse` ([dto/user_dto.go](dto/user_dto.go)).
+- `internal/service/ports.go` — contrato do repositório (`IUserRepository`) ([internal/service/ports.go](internal/service/ports.go)).
+- `internal/service/service.go` — contrato do serviço (`IUserService`) e `UserDTO` ([internal/service/service.go](internal/service/service.go)).
+- `internal/service/domain/users/service.go` — implementação do serviço de domínio ([internal/service/domain/users/service.go](internal/service/domain/users/service.go)).
+- `internal/storage/postgres/users/repository.go` — implementação GORM do repositório e `UserModel` ([internal/storage/postgres/users/repository.go](internal/storage/postgres/users/repository.go)).
 
-- ✅ Golang
-- ✅ Gin (Framework HTTP)
-- ✅ GORM (ORM)
-- ✅ SQLite (Banco de dados local)
+Endpoints principais
 
----
+- POST `/api/users` — cria usuário. Recebe `CreateUserRequest` (JSON) e retorna `{ "id": <id> }`.
+- GET `/api/users` — lista usuários. Retorna array de `UserResponse`.
 
-## 📁 Estrutura do Projeto
+Configuração e execução
 
-```bash
-users-crud/
-├── controller/
-│   └── user_controller.go
-├── db/
-│   └── db.go
-├── models/
-│   └── user.go
-├── repository/
-│   └── user_repository.go
-├── service/
-│   └── user_service.go
-├── go.mod
-└── main.go
-```
-
----
-
-## ⚙️ Como configurar o projeto
-
-### 1️⃣ Clonar o repositório
+1. Configure a variável de ambiente `DATABASE_URL`. Se não setada, `main.go` usa uma DSN padrão para desenvolvimento local:
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repo.git
-cd users-crud
+export DATABASE_URL="host=localhost user=postgres password=postgres dbname=usersdb port=5432 sslmode=disable TimeZone=UTC"
 ```
 
-> _(Se estiver usando localmente, ignore essa etapa)_
-
----
-
-### 2️⃣ Iniciar o módulo Go
-
-```bash
-go mod init meu-treino-golang/users-crud
-```
-
----
-
-### 3️⃣ Instalar as dependências
-
-```bash
-go get github.com/gin-gonic/gin
-go get gorm.io/gorm
-go get gorm.io/driver/sqlite
-```
-
----
-
-### 4️⃣ Organizar dependências
-
-```bash
-go mod tidy
-```
-
----
-
-## ▶️ Como rodar a aplicação
-
-Na raiz do projeto:
+2. Rodar em modo desenvolvimento:
 
 ```bash
 go run main.go
 ```
 
-Se tudo estiver correto, você verá:
-
-```
-Listening and serving HTTP on :8080
-```
-
----
-
-## 🌐 Endpoints disponíveis
-
-### ✅ Criar usuário
-
-```
-POST /users
-```
-
-**Body (JSON):**
-
-```json
-{
-  "nome": "João Silva",
-  "email": "joao@email.com"
-}
-```
-
----
-
-### 📄 Listar usuários
-
-```
-GET /users
-```
-
----
-
-### ✏️ Atualizar usuário
-
-```
-PUT /users/{id}
-```
-
-**Exemplo:**
-
-```
-PUT /users/1
-```
-
-**Body (JSON):**
-
-```json
-{
-  "nome": "João Atualizado",
-  "email": "joao@email.com"
-}
-```
-
----
-
-### 🗑️ Deletar usuário
-
-```
-DELETE /users/{id}
-```
-
----
-
-## 🧪 Testando com Postman
-
-### Criar usuário
-
-- Método: `POST`
-- URL:
-
-```
-http://localhost:8080/users
-```
-
-- Body → raw → JSON:
-
-```json
-{
-  "nome": "Maria Oliveira",
-  "email": "maria@email.com"
-}
-```
-
----
-
-### Listar usuários
-
-- Método: `GET`
-- URL:
-
-```
-http://localhost:8080/users
-```
-
----
-
-## 🧪 Testando com `curl`
-
-### Criar usuário
+3. Build para produção:
 
 ```bash
-curl -X POST http://localhost:8080/users \
-  -H "Content-Type: application/json" \
-  -d '{"nome":"João Silva","email":"joao@email.com"}'
+go build -o users-service ./
+./users-service
 ```
 
----
+Testes
 
-### 📄 Listar todos os usuários
+- Executar todos os testes (unitários e de pacote):
 
 ```bash
-curl http://localhost:8080/users
+go test ./... -v
 ```
 
----
+- Contract tests: há testes que validam se o repositório implementa corretamente a porta (`internal/storage/postgres/users/contract_test.go`). Esses testes podem exigir um PostgreSQL disponível quando realizam operações de integração.
 
-### ✏️ Atualizar um usuário
+Observações de desenvolvimento
+
+- Mantenha a regra de importação: `pkg/handler` nunca deve importar `internal/storage` diretamente. O ponto único de wiring é `main.go`/`routes`/`internal/common`.
+- Para testar a camada de serviço, use mocks da interface `internal/service.IUserRepository`.
+- As migrations são feitas via `gorm.AutoMigrate` no `main.go` para `UserModel`.
+
+Exemplos rápidos (cURL)
+
+Criar usuário:
 
 ```bash
-curl -X PUT http://localhost:8080/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"nome":"João Atualizado","email":"joao.novo@email.com"}'
+curl -X POST http://localhost:8080/api/users \
+ -H "Content-Type: application/json" \
+ -d '{"name":"Alice","email":"alice@example.com"}'
 ```
 
----
-
-### 🗑️ Deletar um usuário
+Listar usuários:
 
 ```bash
-curl -X DELETE http://localhost:8080/users/1
+curl http://localhost:8080/api/users
 ```
+
+Próximos passos sugeridos
+
+- Adicionar um `Makefile` com alvos: `run`, `build`, `test`, `migrate`.
+- Adicionar CI que rode `go test ./...` e execute contract tests contra um Postgres em container.
+- Posso adicionar o `Makefile` e o workflow de CI de exemplo se desejar.
 
 ---
 
-### 🔎 Teste rápido de status
-
-```bash
-curl -i http://localhost:8080/users
-```
-
-> Se retornar `200 OK`, sua API está funcionando corretamente 🎉
-
----
-
-## 💾 Banco de dados
-
-O banco utilizado é **SQLite**.
-
-O arquivo é criado automaticamente:
-
-```
-users.db
-```
-
-Você pode abrir esse arquivo usando:
-
-- **DB Browser for SQLite**
-- **SQLiteStudio**
-- ou qualquer visualizador de SQLite.
-
----
-
-## 📚 Arquitetura do Projeto
-
-A aplicação segue o padrão:
-
-```
-Controller → Service → Repository → Database
-```
-
-- **Controller**: recebe as requisições HTTP (Gin)
-- **Service**: aplica regras de negócio
-- **Repository**: acessa o banco de dados com GORM
-
----
-
-## 🛑 Erros comuns
-
-### ❌ 404 Not Found
-
-Verifique a rota:
-
-```
-/users
-```
-
-ou
-
-```
-/api/users
-```
-
----
-
-### ❌ Porta já em uso
-
-```
-listen tcp :8080: bind: address already in use
-```
-
-Finalize o processo anterior ou altere a porta no `main.go`.
-
----
-
-## 🧾 Licença
-
-Projeto livre para fins de estudo e aprendizado 📚
+Licença: Projeto livre para fins de estudo e aprendizado.

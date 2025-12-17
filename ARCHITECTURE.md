@@ -35,10 +35,12 @@ users-service/
 ## Regras de Importação (depguard)
 
 ### ❌ Proibido
+
 - `pkg/handler/` importar `internal/storage/`
 - Qualquer lugar importar storage fora do wiring
 
 ### ✅ Permitido
+
 - `pkg/handler/` → `internal/service/` (abstrações)
 - `internal/service/domain/` → `internal/service/` (portas)
 - `internal/storage/postgres/` → `internal/service/` (portas)

@@ -1,10 +1,12 @@
+// Package users provides database access for user data.
 package users
 
 import (
 	"context"
 
-	"gorm.io/gorm"
 	"meu-treino-golang/users-crud/internal/service"
+
+	"gorm.io/gorm"
 )
 
 type UserModel struct {
@@ -45,4 +47,11 @@ func (r *Repository) List(ctx context.Context) ([]service.UserDTO, error) {
 	}
 
 	return users, nil
+}
+func (r *Repository) GetByID(ctx context.Context, id uint) (*UserModel, error) {
+	var user UserModel
+	if err := r.db.WithContext(ctx).First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

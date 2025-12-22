@@ -4,12 +4,14 @@ import (
 	"log"
 	"os"
 
+	"meu-treino-golang/users-crud/internal/common"
+	"meu-treino-golang/users-crud/internal/storage/postgres/organizations"
+	"meu-treino-golang/users-crud/internal/storage/postgres/users"
+	"meu-treino-golang/users-crud/routes"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"meu-treino-golang/users-crud/internal/common"
-	"meu-treino-golang/users-crud/internal/storage/postgres/users"
-	"meu-treino-golang/users-crud/routes"
 )
 
 func main() {
@@ -29,6 +31,11 @@ func main() {
 	// 2. AutoMigrate UserModel
 	if err := database.AutoMigrate(&users.UserModel{}); err != nil {
 		log.Fatal("Failed to migrate database:", err)
+	}
+
+	// 2a. AutoMigrate Organization Models
+	if err := database.AutoMigrate(&organizations.OrganizationModel{}, &organizations.OrgUserModel{}); err != nil {
+		log.Fatal("Failed to migrate organization models:", err)
 	}
 
 	// 3. Inicializar dependências

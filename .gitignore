@@ -1,0 +1,55 @@
+# Binaries for programs and plugins
+/*.exe
+/*.dll
+/*.so
+/*.dylib
+/*.test
+/*.out
+
+# Output of the go coverage tool
+*.coverprofile
+
+# Dependency directories (remove the comment below if you use a vendor directory)
+vendor/
+
+# Go build
+bin/
+build/
+
+# IDE/editor directories
+.idea/
+.vscode/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+users.db
+
+# Logs
+*.log
+
+# Docker
+docker-compose.override.yml
+*.local
+
+# Node modules (if any frontend)
+node_modules/
+
+# Go modules cache (optional)
+/go/pkg/mod/
+
+# IntelliJ project files (if any remain)
+*.iml
+
+# Misc
+.cache/
+.pytest_cache/
+coverage/

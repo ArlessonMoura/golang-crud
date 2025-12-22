@@ -4,6 +4,7 @@ package users
 import (
 	"context"
 
+	"meu-treino-golang/users-crud/internal/common"
 	"meu-treino-golang/users-crud/internal/service"
 
 	"gorm.io/gorm"
@@ -48,10 +49,18 @@ func (r *Repository) List(ctx context.Context) ([]service.UserDTO, error) {
 
 	return users, nil
 }
-func (r *Repository) GetByID(ctx context.Context, id uint) (*UserModel, error) {
+func (r *Repository) GetByID(ctx context.Context, id uint) (*service.UserDTO, error) {
 	var user UserModel
 	if err := r.db.WithContext(ctx).First(&user, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, common.ErrUserNotFound
+		}
 		return nil, err
 	}
-	return &user, nil
+	dto := &service.UserDTO{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+	return dto, nil
 }

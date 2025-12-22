@@ -30,3 +30,7 @@ func (s *Service) CreateUser(ctx context.Context, name, email string) (uint, err
 func (s *Service) ListUsers(ctx context.Context) ([]service.UserDTO, error) {
 	return s.repo.List(ctx)
 }
+
+func (s *Service) GetUserByID(ctx context.Context, id uint) (*service.UserDTO, error) {
+	return s.repo.GetByID(ctx, id)
+}

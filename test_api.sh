@@ -61,6 +61,18 @@ USER2=$(curl -s -X POST "$BASE_URL/users" \
 USER_ID2=$(echo $USER2 | grep -o '"id":[0-9]*' | grep -o '[0-9]*')
 echo -e "${GREEN}User 2 ID: $USER_ID2${NC}\n"
 
+# Test 6a: Get User by ID (User 1)
+echo -e "${YELLOW}[TEST 6a] Getting user 1 by ID...${NC}"
+curl -s -X GET "$BASE_URL/users/$USER_ID1" \
+  -H "Content-Type: application/json" | jq '.'
+echo ""
+
+# Test 6b: Get User by ID (User 2)
+echo -e "${YELLOW}[TEST 6b] Getting user 2 by ID...${NC}"
+curl -s -X GET "$BASE_URL/users/$USER_ID2" \
+  -H "Content-Type: application/json" | jq '.'
+echo ""
+
 # Test 7: Add User to Organization
 echo -e "${YELLOW}[TEST 7] Adding users to organization...${NC}"
 curl -s -X POST "$BASE_URL/org/$ORG_ID/users" \
